@@ -1,8 +1,8 @@
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
 const path = require('path');
-const cv = require('opencv4nodejs');
-
+// const cv = require('opencv4nodejs');
+const sharp = require('sharp');
 // Set the path to the ffprobe binary
 ffmpeg.setFfprobePath('/usr/bin/ffprobe');
 
@@ -17,22 +17,40 @@ async function getVideoDuration(videoPath) {
         });
     });
 }
+async function processImage(imagePath) {
+    try {
+        // Read image using sharp
+        const imageBuffer = await sharp(imagePath).toBuffer();
 
-function processImage(imagePath) {
-    const frame = cv.imread(imagePath);
+        // Implement your detection logic here
+        // Note: sharp focuses more on image processing, and it doesn't have built-in face detection
+        // You may need to use a different library or service for face detection.
 
-    // Implement your detection logic here
-    // e.g., face detection
-    const classifier = new cv.CascadeClassifier(cv.HAAR_FRONTALFACE_ALT2);
-    const resizedFrame = frame.rescale(2.5); // Adjust the scaling factor as needed
-    const faces = classifier.detectMultiScale(resizedFrame);
-
-    // const faces = classifier.detectMultiScale(frame);
-    
-    // Print detection results
-    console.log(`Detected ${faces.objects.length || 0} faces in the frame: ${imagePath}`);
-    console.log("..........Face details:", faces);
+        // Example: Print image dimensions
+        const imageInfo = await sharp(imageBuffer).metadata();
+        console.log(`Image dimensions: ${imageInfo.width} x ${imageInfo.height}`);
+        
+        // Your face detection logic here...
+        
+    } catch (error) {
+        console.error('Error processing image:', error);
+    }
 }
+// function processImage(imagePath) {
+//     const frame = cv.imread(imagePath);
+
+//     // Implement your detection logic here
+//     // e.g., face detection
+//     const classifier = new cv.CascadeClassifier(cv.HAAR_FRONTALFACE_ALT2);
+//     const resizedFrame = frame.rescale(2.5); // Adjust the scaling factor as needed
+//     const faces = classifier.detectMultiScale(resizedFrame);
+
+//     // const faces = classifier.detectMultiScale(frame);
+    
+//     // Print detection results
+//     console.log(`Detected ${faces.objects.length || 0} faces in the frame: ${imagePath}`);
+//     console.log("..........Face details:", faces);
+// }
 
 module.exports = {
     processExtractedFrames: async () => {
